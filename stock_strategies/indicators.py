@@ -8,7 +8,8 @@ def add_indicators(df: pd.DataFrame) -> pd.DataFrame:
     df["ma5"] = df["close"].rolling(5).mean()
     df["ma20"] = df["close"].rolling(20).mean()
     df["ma60"] = df["close"].rolling(60).mean()
-
+    df["ma200"] = df["close"].rolling(200).mean()
+    
     df["bb_mid"] = df["close"].rolling(20).mean()
     bb_std = df["close"].rolling(20).std()
     df["bb_upper"] = df["bb_mid"] + 2 * bb_std
@@ -55,8 +56,8 @@ def tech_score_at(row: pd.Series, params: dict | None = None) -> dict:
     score = 0.0
     signals: list[str] = []
 
-    if use_ma and pd.notna(row["ma20"]) and pd.notna(row["ma60"]):
-        if row["close"] > row["ma20"] > row["ma60"]:
+    if use_ma and pd.notna(row["ma20"]) and pd.notna(row["ma60"]) and pd.notna(row["ma200"]):
+        if row["close"] > row["ma20"] > row["ma60"] > row["ma200"]:
             score += max_per
             signals.append("均線多頭")
         elif row["close"] > row["ma20"]:
