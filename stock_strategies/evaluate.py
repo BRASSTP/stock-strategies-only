@@ -63,7 +63,7 @@ def evaluate(stock_id: str, name: str, strategy: dict | None = None) -> Optional
         if wsum > 0:
             wf, wt, wb = wf / wsum, wt / wsum, wb / wsum
 
-        signal_score = round(wf * fund_score + wt * tech_score + wb * bt_score, 1)
+        signal_score = round(0.2 * fund_score + 0.7 * tech_score + 0.1 * bt_score, 1)
 
         fund_gate = (not params["fundamental_pass_required"]) or fund_pass
         if (
