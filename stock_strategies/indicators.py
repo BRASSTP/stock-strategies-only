@@ -10,6 +10,11 @@ def add_indicators(df: pd.DataFrame) -> pd.DataFrame:
     df["ma60"] = df["close"].rolling(60).mean()
     df["ma200"] = df["close"].rolling(200).mean()
     
+    """計算20日均量與5日均量
+    """
+    df["v_ma5"] = df['Volume'].rolling(window=5).mean()
+    df["v_ma20"] = df['Volume'].rolling(window=20).mean()
+    
     df["bb_mid"] = df["close"].rolling(20).mean()
     bb_std = df["close"].rolling(20).std()
     df["bb_upper"] = df["bb_mid"] + 2 * bb_std
@@ -39,18 +44,19 @@ def add_indicators(df: pd.DataFrame) -> pd.DataFrame:
 
 def tech_score_at(row: pd.Series, params: dict | None = None) -> dict:
     """對一天計算技術分 (0-100)。
-    params 可包含 use_ma_alignment / use_bollinger_bounce / use_kd_golden_cross /
-    use_macd_bullish 四個布林開關來開關各訊號。
+    params 可包含 use_ma_alignment / use_v_ma_alignment /use_bollinger_bounce / use_kd_golden_cross /
+    use_macd_bullish 5個布林開關來開關各訊號。
     """
     if params is None:
         params = {}
     use_ma = params.get("use_ma_alignment", True)
-    use_bb = params.get("use_bollinger_bounce", True)
-    use_kd = params.get("use_kd_golden_cross", True)
-    use_macd = params.get("use_macd_bullish", True)
+    use_v_ma = params.get("use_v_ma_alignment", True)
+    use_bb = params.get("use_bollinger_bounce", false)
+    use_kd = params.get("use_kd_golden_cross", false)
+    use_macd = params.get("use_macd_bullish", false)
 
     # 開啟的訊號數量決定每個訊號最大分數，讓總分維持 0-100
-    enabled = sum([use_ma, use_bb, use_kd, use_macd]) or 1
+    enabled = sum([use_ma, use_v_ma, use_bb, use_kd, use_macd]) or 1
     max_per = 100 / enabled
 
     score = 0.0
@@ -61,8 +67,16 @@ def tech_score_at(row: pd.Series, params: dict | None = None) -> dict:
             score += max_per
             signals.append("均線多頭-大長頭")
         elif row["close"] > row["ma20"]:
-            score += max_per * 0.48
-
+            score += max_per * 0.5
+ 
+    if use_v_ma and pd.notna(row["v_ma5"]) and pd.notna(row["v_ma20"]):
+        if row["Volume"] > row["v_ma20"] :
+            score += max_per
+            signals.append("量增輪迴")
+        elif row["Volume"] > row["v_ma5"]:
+            score += max_per * 0.5
+        
+    
     if use_bb and pd.notna(row["bb_lower"]) and pd.notna(row["bb_mid"]):
         dist = (row["close"] - row["bb_lower"]) / row["bb_lower"]
         if 0 < dist < 0.03:
