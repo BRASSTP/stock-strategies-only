@@ -59,7 +59,7 @@ def tech_score_at(row: pd.Series, params: dict | None = None) -> dict:
     if use_ma and pd.notna(row["ma20"]) and pd.notna(row["ma60"]) and pd.notna(row["ma200"]):
         if row["close"] > row["ma20"] > row["ma60"] > row["ma200"]:
             score += max_per
-            signals.append("均線多頭")
+            signals.append("均線多頭-大長頭")
         elif row["close"] > row["ma20"]:
             score += max_per * 0.48
 
