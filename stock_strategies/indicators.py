@@ -12,8 +12,8 @@ def add_indicators(df: pd.DataFrame) -> pd.DataFrame:
     
     """計算20日均量與5日均量
     """
-    df["vma5"] = df['volume'].rolling(window=5).mean()
-    df["vma20"] = df['volume'].rolling(window=20).mean()
+    df["vma5"] = df['volume'].rolling(5).mean()
+    df["vma20"] = df['volume'].rolling(20).mean()
     
     df["bb_mid"] = df["close"].rolling(20).mean()
     bb_std = df["close"].rolling(20).std()
