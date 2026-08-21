@@ -22,7 +22,7 @@ except ImportError:
     pass
 
 from stock_strategies.sheet import (
-    read_watchlist,
+    read_watchlist_01,
     append_signals,
     read_performance,
     write_performance,
@@ -53,10 +53,10 @@ def main():
         print(f"❌ 缺少環境變數: {missing}", file=sys.stderr)
         sys.exit(1)
 
-    # 1. 讀取 watchlist
+    # 1. 讀取 watchlist_01
     print(f"[{datetime.now()}] 讀取 watchlist...")
-    watchlist = read_watchlist()
-    print(f"  → {len(watchlist)} 檔啟用中")
+    watchlist = read_watchlist_01()
+    print(f"  → {len(watchlist_01)} 檔啟用中")
 
     # 2. 取得大盤狀態（濾鏡）
     print("取得大盤狀態...")
@@ -71,10 +71,10 @@ def main():
 
     # 3. 個股評分
     results = []
-    for i, row in enumerate(watchlist, 1):
+    for i, row in enumerate(watchlist_01, 1):
         sid = str(row["stock_id"])
         name = row.get("name", "")
-        print(f"[{i}/{len(watchlist)}] {sid} {name}")
+        print(f"[{i}/{len(watchlist_01)}] {sid} {name}")
         r = evaluate(sid, name)
         if r:
             results.append(r)
